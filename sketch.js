@@ -391,7 +391,7 @@ function INTRO1() {
   fill("lightyellow");
   text("leave the current galaxy.", displayWidth/4, 390);
   text("Keep pressing space to fly the ship.", displayWidth/4, 420);
-  text("Use 'a' and 'd' arrowkeys to move.", displayWidth/4, 450);
+  text("Use 'Left' and 'Right' arrowkeys to move.", displayWidth/4, 450);
 
   fill("white");
   textSize(25);
@@ -430,8 +430,8 @@ function INTRO2() {
 
   fill("lightgreen");
   text("The plants cannot be killed.", displayWidth/4, 320);
-  text("Press 'space' to jump and 'S' to shoot.", displayWidth/4, 350);
-  text("Press 'D' to go forward and 'A' to go backward.", displayWidth/4, 380);
+  text("Press 'Up arrow' to jump and 'Space' to shoot.", displayWidth/4, 350);
+  text("Press 'Right Arrow Key' to go forward and 'Left Arrow Key' to go backward.", displayWidth/4, 380);
 
   fill("lightyellow");
   text("Your health will be restored every 15 points.", displayWidth/4, 420);
