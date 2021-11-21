@@ -2,7 +2,7 @@
 var score1,score2;
 var health1, health2;
 var gameState;
-var star, starImage;
+var star, starImage, fuel, fuelImage;
 var resetImage, resetG;
 var B1g, B1I;
 var bg, bgI, bg2, bg2I;
@@ -37,6 +37,7 @@ boy_running = loadAnimation("boy_1.png" , "boy_2.png" , "boy_3.png" , "boy_4.png
   zombie2Image = loadImage("zombie2.png");
 
   starImage = loadImage("Star.png");
+  fuelImage = loadImage("fuel.png");
 
   B1I = loadImage("cyanB.png");
 
@@ -88,10 +89,10 @@ function setup() {
   //boy in zombie game
   boy = createSprite(150, 500, 10, 10);
   boy.addAnimation("running", boy_running);
-  boy.scale = 4.5;
+  boy.scale = 2.0;
   boy.visible = false;
-  boy.debug = true;
-  boy.setCollider("rectangle", 0, 0, 30, 40);
+  //boy.debug = true;
+  boy.setCollider("rectangle", 0, 0, 90, 120);
 
   //groups
   B1g = new Group();
@@ -257,6 +258,10 @@ function draw() {
     RESET();
   }
 
+  if (gameState === "reached") {
+    REACHED();
+  }
+
   //invisible edges
   dedge.visible = false;
   redge.visible = false;
@@ -345,18 +350,14 @@ function MENU() {
 //random game
 function randomGState() {
 
-  var rand = Math.round(random(1, 4));
+  var rand = Math.round(random(1, 2));
 
   //choosing game
   if (rand === 1) {
     gameState = "intro1";
   } else if (rand === 2) {
     gameState = "intro2";
-  } else if (rand === 3) {
-    gameState = "intro1";
-  } else if (rand === 4) {
-    gameState = "intro2";
-  }
+  } 
 
 }
 
@@ -379,7 +380,7 @@ function INTRO1() {
   text("and take help from allies.", displayWidth/4, 150);
 
   fill("lightblue");
-  text("Dodge the asteroids and collect stars to increase the score.", displayWidth/4, 190);
+  text("Dodge the asteroids and collect fuel to increase the score.", displayWidth/4, 190);
   text("Avoid crashing into other spaceships.", displayWidth/4, 220);
   text("If you go out of the designated space, then the game will end.", displayWidth/4, 250);
 
@@ -473,7 +474,7 @@ function G1() {
   rocket.velocityY = rocket.velocityY + 0.3;
 
   if (rocket.y <= -30000){
-    gameState = "win";
+    gameState = "reached";
   }
 
   //bg.velocityY = 4;
@@ -481,6 +482,10 @@ function G1() {
   /*if (bg.y > 355) {
     bg.y = 90;
   }*/
+
+  if(score1 == 40){
+    gameState = "win";
+  }
 
   spawnAsteroids();
   spawnStar();
@@ -534,7 +539,7 @@ function A1() {
 
 function A2() {
   var ast2 = createSprite(225, camera.position.y-400, 20, 20);
-  ast2.x = Math.round(random(30, 420));
+  ast2.x = Math.round(random(30, 1420));
   ast2.velocityY = 5 + score1 * 5 / 10;
   ast2.addImage(asteroid2);
   ast2.scale = 0.2;
@@ -547,16 +552,16 @@ function A2() {
 function spawnStar() {
   if (frameCount % 70 === 0) {
 
-    var star = createSprite(225, camera.position.y, 20, 20);
-    star.x = Math.round(random(50, 1430));
-    //star.y = Math.round(random(50, 250));
-    //star.velocityY = 3;
-    star.addImage(starImage);
-    star.scale = 0.015;
-    //star.debug = true;
-    star.setCollider("circle", -30, 20, 200);
-    star.lifetime = 250;
-    STARS.add(star);
+    var fuel = createSprite(225, camera.position.y, 20, 20);
+    fuel.x = Math.round(random(50, 1430));
+    //fuel.y = Math.round(random(50, 250));
+    //fuel.velocityY = 3;
+    fuel.addImage(fuelImage);
+    fuel.scale = 0.175;
+    //fuel.debug = true;
+    fuel.setCollider("circle", -30, 20, 200);
+    fuel.lifetime = 250;
+    STARS.add(fuel);
   }
 }
 
@@ -598,6 +603,10 @@ function G2() {
   boy.velocityY = boy.velocityY + 0.4;
 
   if (boy.x >= 30000){
+    gameState = "reached";
+  }
+
+  if (score2 == 50){
     gameState = "win";
   }
 
@@ -791,6 +800,72 @@ function RESET() {
 }
 
 function WIN(){
+  rocket.x = 725;
+  rocket.y = 337.5;
+  boy.x = 150;
+  rocket.velocityY = 0;
+  rocket.velocityX = 0;
+  boy.velocityY = 0;
+
+  boy.visible = false;
+  rocket.visible = false;
+  bg.visible = false;
+  bg2.visible = false;
+
+  birdgroup.destroyEach();
+  zombie1G.destroyEach();
+  zombie2G.destroyEach();
+  plant1G.destroyEach();
+  plant2G.destroyEach();
+  LG.destroyEach();
+  AST.destroyEach();
+  AST2.destroyEach();
+  STARS.destroyEach();
+  spaceshipG.destroyEach();
+
+  background("black");
+
+  //highscore 1
+  if (localStorage["HighScore1"] < score1) {
+    localStorage["HighScore1"] = score1;
+  }
+
+  //highscore 2
+  if (localStorage["HighScore2"] < score2) {
+    localStorage["HighScore2"] = score2;
+  }
+
+  //reset button
+  var reset = createSprite(725, 300, 20, 20);
+  reset.addImage(resetImage);
+  reset.scale = 0.7;
+  resetG.add(reset);
+
+  camera.position.x = reset.x;
+  camera.position.y = reset.y;
+
+  //reseting game
+  if (mousePressedOver(reset)) {
+    gameState = "menu";
+  }
+
+  textSize(50);
+  fill("white");
+  stroke("blue");
+  strokeWeight(5);
+  text("You Reached the End!!😎", displayWidth/2.5, 110);
+
+  fill("white");
+  noStroke();
+  textSize(30);
+  text("The game has ended.", displayWidth/3, 450);
+  text("Click on 'Reset' to go to Menu", displayWidth/3, 550);
+  
+  text("Planet Jump HI Score : " + localStorage["HighScore2"], displayWidth/2.7, 200);
+  text("Space Shooter HI Score : " + localStorage["HighScore1"], displayWidth/2.8, 250);
+}
+
+function REACHED(){
   rocket.x = 725;
   rocket.y = 337.5;
   boy.x = 150;
